@@ -1,0 +1,35 @@
+#rh-base
+rhbase_firewall_allow_services:
+  - imap
+  - imaps
+  - pop3
+  - pop3s
+  - smtp
+  - smtps
+  - smtp-submission
+  - http
+  - https
+  
+#DNS SERVER
+dns_nameservers: 
+  - "DNS1=172.16.0.40"
+
+# Postfix
+postfix_myhostname: 'mail.green.local'
+postfix_mydomain: 'green.local'
+postfix_home_mailbox: 'mail/'
+postfix_mynetwork: 172.16.0.0/27
+ldap_fqdn1: alfa1.green.local
+ldap_ou: People
+ldap_dcname: alfa1
+ldap_domainname: green
+ldap_root_domain: local
+postfix_ldap: false
+
+#Squirrelmal
+httpd_scripting: 'php'
+Squirrelmail_domain: green.local
+Squirrelmail_imapServerAddress: delta1.green.local
+Squirrelmail_smtpServerAddress: detla1.green.local
+Squirrelmail_imap_port: 143
+Squirrelmail_smtp_port: 587

@@ -1,0 +1,127 @@
+#dns
+dns_nameservers: 
+  - "DNS1=172.16.0.40"
+
+#rh-base
+rhbase_install_packages:
+    - samba
+    - samba-common
+    - samba-client
+    - wget
+rhbase_firewall_allow_services:
+  - samba
+rhbase_user_groups:
+  - itadministratie
+  - verkoop
+  - administratie
+  - ontwikkeling
+  - directie
+rhbase_users:
+  - name: keanu
+    groups:
+      - wheel
+      - root
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: ismail
+    groups:
+      - itadministratie
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: itadministratieuser
+    groups:
+      - itadministratie
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: lennert
+    groups:
+      - verkoop
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: verkoopuser
+    groups:
+      - verkoop
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: rob
+    groups:
+      - administratie
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: administratieuser
+    groups:
+      - administratie
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: robin
+    groups:
+      - ontwikkeling
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: ontwikkelinguser
+    groups:
+      - ontwikkeling
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: thomas
+    groups:
+      - directie
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+  - name: directieuser
+    groups:
+      - directie
+    password: '$6$glOruZ2Pc/EiQVtH$Wa.ndyK0JLUHrYYQ8kWOZo5bpCW4ErZ0M7z0n667g1A8fqbJh4yckrdv90uQEGwiPqF2RM2kJNfs3uS/wrjoG1' #hash for "Test123"
+    
+    #samba
+samba_netbios_name: 'GREEN'
+samba_server_string: 'Samba file server'
+samba_workgroup: 'GREEN.LOCAL'
+#samba_wins_support: false
+#samba_mitigate_cve_2017_7494: false
+samba_load_homes: true
+samba_homes_include: lima-home-include.conf
+
+samba_users:
+  - name: ismail
+    password: Test123
+  - name: lennert
+    password: Test123
+  - name: rob
+    password: Test123
+  - name: robin
+    password: Test123
+  - name: thomas
+    password: Test123
+  - name: itadministratieuser
+    password: Test123
+  - name: verkoopuser
+    password: Test123
+  - name: administratieuser
+    password: Test123
+  - name: ontwikkelinguser
+    password: Test123
+  - name: directieuser
+    password: Test123
+
+samba_shares:
+  - name: itadministra
+    comment: 'IT Administratie share'
+    browseable: yes
+    group: itadministratie
+    write_list: +itadministratie
+    valid_users: +itadministratie
+  - name: verkoop
+    comment: 'Verkoop share'
+    browseable: yes
+    group: verkoop
+    write_list: +verkoop
+    valid_users: +verkoop
+  - name: administrat
+    comment: 'Administratie share'
+    browseable: yes
+    group: administratie
+    write_list: +administratie
+    valid_users: +administratie
+  - name: ontwikkeling
+    comment: 'ontwikkeling share'
+    browseable: yes
+    group: ontwikkeling
+    write_list: +ontwikkeling
+    valid_users: +ontwikkeling
+  - name: directie
+    comment: 'directie share'
+    browseable: yes
+    group: directie
+    write_list: +directie
+    valid_users: +directie

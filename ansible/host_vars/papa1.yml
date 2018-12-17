@@ -1,0 +1,16 @@
+rhbase_install_packages:
+#  - dhcp
+  - tftp
+  - tftp-server
+  - syslinux
+  - vsftpd
+  - xinetd
+
+dns_nameservers: 
+  - "DNS1=172.16.0.40"
+
+rhbase_firewall_allow_services:
+  - tftp
+  - http
+  - https
+  - ftp

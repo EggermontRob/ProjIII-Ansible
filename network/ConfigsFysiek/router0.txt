@@ -1,0 +1,114 @@
+!
+
+hostname Router0
+
+!
+
+boot-start-marker
+
+boot-end-marker
+
+!
+
+!
+
+!
+interface Tunnel1
+ip address 192.168.2.1 255.255.255.0
+tunnel source 192.0.2.2
+tunnel destination 192.0.2.6
+!
+
+!
+
+interface GigabitEthernet0/0/0
+ 
+ip address 172.16.0.70 255.255.255.252
+ 
+negotiation auto
+
+!
+
+interface GigabitEthernet0/0/1
+ 
+ip address 192.0.2.2 255.255.255.252
+ 
+negotiation auto
+
+!
+
+interface Serial0/1/0
+ 
+no ip address
+ 
+shutdown
+
+!
+
+interface Serial0/1/1
+ 
+no ip address
+ 
+shutdown
+
+!
+
+interface GigabitEthernet0
+ 
+vrf forwarding Mgmt-intf
+ 
+no ip address
+ 
+shutdown
+ 
+negotiation auto
+
+!
+
+interface Vlan1
+ 
+no ip address
+ 
+shutdown
+
+!
+
+!
+
+router eigrp 1
+ 
+network 172.16.0.0
+ 
+network 192.0.2.0 0.0.0.3
+
+network 192.168.2.0
+
+!
+
+ip forward-protocol nd
+no ip http server
+no ip http secure-server
+ip tftp source-interface GigabitEthernet0
+
+ip route 172.16.0.0 255.255.255.224 172.16.0.69
+
+ip route 172.16.0.32 255.255.255.224 172.16.0.69
+
+ip route 172.16.0.64 255.255.255.252 172.16.0.69
+
+ip route 172.16.1.0 255.255.255.192 172.16.0.69
+
+ip route 172.18.0.0 255.255.0.0 GigabitEthernet0/0/1!
+!
+!
+
+!
+
+line con 0
+ 
+logging synchronous
+ 
+
+!
+
+end

@@ -1,0 +1,104 @@
+---
+# Variables for LDAP domain controller
+rhbase_firewall_allow_ports:
+  - 80/tcp
+  - 389/tcp
+  - 9830/tcp
+  - 636/tcp
+  - 3269/tcp
+
+rhbase_firewall_interfaces:
+  - enp0s3
+  - enp0s8
+
+# Setting DNS servers
+dns_nameservers:
+  - "DNS1=172.16.0.40"
+
+
+
+
+dirsrv_hostname: alfa1
+dirsrv_fqdn: alfa1.green.local
+dirsrv_password: ldapadmin
+dirsrv_admin_password: ldapadmin
+dirsrv_rootdn: "cn=admin"
+dirsrv_ip: 172.16.0.3
+
+
+dirsrv_remove_entries:
+  - "ou=Special Users,dc=green,dc=local"
+  - "cn=Accounting Managers,ou=Groups,dc=green,dc=local"
+  - "cn=HR Managers,ou=Groups,dc=green,dc=local"
+  - "cn=QA Managers,ou=Groups,dc=green,dc=local"
+  - "cn=PD Managers,ou=Groups,dc=green,dc=local"
+
+
+dirsrv_groups:
+  - name: itadministratie
+    gidnumber: 1001
+    members:
+      - ismail
+  - name: verkoop
+    gidnumber: 1002
+    members:
+      - lennert
+  - name: administratie
+    gidnumber: 1003
+    members:
+      - rob
+  - name: ontwikkeling
+    gidnumber: 1004
+    members:
+      - robin
+  - name: directie
+    gidnumber: 1005
+    members:
+      - thomas
+
+dirsrv_users:
+  - uid: ismail
+    cn: Ismail
+    sn: El Kaddouri
+    description: Ismail El Kaddouri
+    password: "{SSHA}dIfwvAy7VNBkjywXaAXsgLPCiXemGegCShfPVQ==" # hash for "Test123"
+    uidnumber: 700
+    gidnumber: 700
+    loginshell: /bin/bash
+    homedirectory: /home/ismail
+  - uid: lennert
+    cn: Lennert
+    sn: Mertens
+    description: Lennert Mertens
+    password: "{SSHA}dIfwvAy7VNBkjywXaAXsgLPCiXemGegCShfPVQ==" # hash for "Test123"
+    uidnumber: 701
+    gidnumber: 701
+    loginshell: /bin/bash
+    homedirectory: /home/lennert
+  - uid: rob
+    cn: Rob
+    sn: Eggermont
+    description: Rob Eggermont
+    password: "{SSHA}dIfwvAy7VNBkjywXaAXsgLPCiXemGegCShfPVQ==" # hash for "Test123"
+    uidnumber: 702
+    gidnumber: 702
+    loginshell: /bin/bash
+    homedirectory: /home/rob
+  - uid: robin
+    cn: Robin
+    sn: De Cock
+    description: Robin De Cock
+    password: "{SSHA}dIfwvAy7VNBkjywXaAXsgLPCiXemGegCShfPVQ==" # hash for "Test123"
+    uidnumber: 703
+    gidnumber: 703
+    loginshell: /bin/bash
+    homedirectory: /home/robin
+  - uid: thomas
+    cn: Thomas
+    sn: Vandeveire
+    description: Thomas Vandeveire
+    password: "{SSHA}dIfwvAy7VNBkjywXaAXsgLPCiXemGegCShfPVQ==" # hash for "Test123"
+    uidnumber: 704
+    gidnumber: 704
+    loginshell: /bin/bash
+    homedirectory: /home/thomas

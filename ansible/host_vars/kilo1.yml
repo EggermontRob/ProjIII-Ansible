@@ -1,0 +1,44 @@
+#Kilo1 DHCP-Server
+dns_nameservers:
+  - "DNS1=172.16.0.40"
+
+
+dhcp_global_default_lease_time: 28800 #8 uur
+dhcp_global_max_lease_time: 43200 #12 uur
+dhcp_global_domain_name: green.local
+dhcp_global_next_server: 172.16.0.39 #PXE boot server
+dhcp_global_filename: "pxelinux.0"
+dhcp_global_domain_name_servers:
+  - 172.16.0.40
+  - 172.16.0.4
+  - 172.16.0.5
+dhcp_global_routers: 172.16.0.33
+dhcp_subnets:
+   - ip: 172.16.0.32
+     netmask: 255.255.255.224
+     booting: allow
+     bootp: allow
+     filename: "pxelinux.0"
+  #  - ip: 172.16.1.0  #Vlan 20 Gekende werkstations vast IP ~ MAC; Onbekende werkstations ip address van .7 t.e.m. .62
+  #    netmask: 255.255.255.192
+  #    range_begin: 172.16.1.1
+  #    range_end: 172.16.1.62
+  #    booting: allow
+  #    bootp: allow
+  #    routers: 172.16.1.2
+dhcp_hosts:
+   - name: WS0
+     mac: 'A0:CE:C8:19:DD:30'
+     ip: 172.16.1.3
+   - name: WS1
+     mac: '52:54:00:24:AB:6D'
+     ip: 172.16.1.4
+   - name: WS2
+     mac: '52:54:00:C3:F4:A4'
+     ip: 172.16.1.5
+   - name: WS3
+     mac: '52:54:00:18:C8:4B'
+     ip: 172.16.1.6
+   - name: WS4
+     mac: '52:54:00:2C:22:49'
+     ip: 172.16.1.7

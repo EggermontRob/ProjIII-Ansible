@@ -1,0 +1,8 @@
+rhbase_firewall_allow_ports:
+  - 9200/tcp
+  - 5601/tcp
+
+dns_nameservers: 
+  - "DNS1=172.16.0.40"
+
+metricbeat_ip: 'localhost'

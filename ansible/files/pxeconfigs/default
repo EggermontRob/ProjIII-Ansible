@@ -1,0 +1,16 @@
+default menu.c32
+prompt 0
+
+MENU TITLE PXE Menu
+
+
+LABEL 1
+MENU LABEL ^1) Server
+KERNEL /centos/vmlinuz
+APPEND initrd=/centos/initrd.img inst.repo=ftp://10.0.0.2/pub/centos ks=ftp://10.0.0.2/pub/kick-centos.cfg
+
+
+LABEL 2
+MENU LABEL ^2) Werkstation
+KERNEL /fedora/vmlinuz
+APPEND initrd=/fedora/initrd.img inst.repo=ftp://10.0.0.2/pub/fedora ks=ftp://10.0.0.2/pub/kick-fedora.cfg

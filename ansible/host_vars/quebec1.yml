@@ -1,0 +1,31 @@
+rhbase_firewall_allow_services:
+  - dns
+
+# Settings for DNS
+dns_nameservers:
+  - "DNS1=172.16.0.40" #DIT IS NIET JUIST DIT IS TERUG NAAR QUEBEC ?????? 
+  - "DNS2=172.22.0.2" # Dns van klasnetwerk
+  - "DNS3=8.8.8.8"
+
+#Variables for forwarding DNS > dnsmasq
+#Domain van Dnsmasq
+dnsmasq_domain: 'green.local'
+
+#Local requests needs to be forwarded
+dnsmasq_domain_needed: 'false'
+
+#Adres waarop dns requests toekomen
+dnsmasq_listen_address: 172.16.0.40
+
+#Upstream DNS Servers
+dnsmasq_upstream_servers:
+ #DNS forwarding servers (hogent/klasnetwerk) LAAT DIT ALSJEBLIEFT VOOR 1 KEER STAAN !! Forwarder moet forwarden naar Bravo en Charlie, ook moet die niet-lokale requests doorsturen via de dns servers van het klasnetwerk/hogent
+  - 172.22.0.2
+  - 8.8.8.8
+  #Green.local domein : DNS
+  - /green.local/172.16.0.4 #ns1.green.local
+  - /green.local/172.16.0.5 #ns2.green.local
+  #Red.local domein : DNS
+  
+  - /red.local/172.18.0.34 #ns1.red.local
+  - /red.local/172.18.0.35 #ns2.red.local

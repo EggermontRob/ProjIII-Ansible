@@ -1,0 +1,458 @@
+---
+# tasks file for pxeserver
+- name: "Installing packages"
+  yum:
+    name:
+      - dhcp
+      - tftp
+      - tftp-server
+      - syslinux
+      - vsftpd
+      - xinetd
+    state: present
+
+- name: Edit config file for dhcp
+  blockinfile:
+    path: /etc/dhcp/dhcpd.conf
+    block: |
+
+      ddns-update-style interim;
+      ignore client-updates;
+      authoritative;
+      allow booting;
+      allow bootp;
+      allow unknown-clients;
+
+      # internal subnet for my DHCP Server
+      subnet 10.0.0.0 netmask 255.255.255.0 {
+      range 10.0.0.100 172.16.0.3900;
+      option domain-name-servers 172.16.0.39;
+      option domain-name "pxe.example.com";
+      option routers 172.16.0.39;
+      option broadcast-address 10.255.255.255;
+      default-lease-time 600;
+      max-lease-time 7200;
+
+      # IP of PXE Server
+      next-server 172.16.0.39;
+      filename "pxelinux.0";
+      }
+  - name: Edit config file for tftp
+    lineinfile:
+      path: /etc/xinetd.d/tftp
+      regexp: 'disable'
+      line: 'disable = no'
+
+  - name: Edit config file for SELINUX
+    lineinfile:
+      path: /etc/sysconfig/selinux
+      regexp: 'SELINUX=permissive'
+      line: 'SELINUX=disabled'
+
+  - name: Copying required boot files
+    copy:
+      src: /usr/share/syslinux/pxelinux.0
+      dest: /var/lib/tftpboot
+    remote_src: yes
+
+  - name: Copying required boot files
+    copy:
+      src: /usr/share/syslinux/menu.c32
+      dest: /var/lib/tftpboot
+      remote_src: yes
+
+  - name: Copying required boot files
+    copy:
+      src: /usr/share/syslinux/memdisk
+      dest: /var/lib/tftpboot
+      remote_src: yes
+
+  - name: Copying required boot files
+    copy:
+      src: /usr/share/syslinux/mboot.c32
+      dest: /var/lib/tftpboot
+      remote_src: yes
+
+  - name: Copying required boot files
+    copy:
+      src: /usr/share/syslinux/chain.c32
+      dest: /var/lib/tftpboot
+      remote_src: yes
+
+  - name: Creating directories for Centos & Fedora installation files
+    file:
+      path: /var/lib/tftpboot/pxelinux.cfg
+      state: directory
+
+  - name: Creating directories for Centos installation files
+    file:
+      path: /var/lib/tftpboot/centos
+      state: directory
+
+  - name: Creating directories for Centos installation files
+    file:
+      path: /var/ftp/pub/centos/LiveOS
+      state: directory
+
+  - name: Creating directories for Fedora installation files
+    file:
+      path: /var/lib/tftpboot/fedora
+      state: directory
+
+  - name: Creating directories for Fedora installation files
+    file:
+      path: /var/ftp/pub/fedora/images
+      state: directory
+
+# - name: Download CentOS kernel
+#   get_url:
+#     url: http://mirror.centos.org/centos-7/7.5.1804/os/x86_64/isolinux/vmlinuz
+#     dest: /var/lib/tftpboot/centos/vmlinuz
+
+# - name: Download CentOS initrd.img
+#   get_url:
+#     url: http://mirror.centos.org/centos-7/7.5.1804/os/x86_64/isolinux/initrd.img
+#     dest: /var/lib/tftpboot/centos/initrd.img
+
+# # - name: Download CentOS files
+# #   get_url:
+# # url: http://ftp.belnet.be/mirror/ftp.centos.org/7.5.1804/isos/x86_64/CentOS-7-x86_64-DVD-1804.iso
+# # dest: /vagrant/isofiles/centos.iso
+
+# - name: Download CentOS files
+#   get_url:
+#     url: http://ftp.belnet.be/mirror/ftp.centos.org/7.5.1804/os/x86_64/LiveOS/squashfs.img
+#     dest: /var/ftp/pub/centos/LiveOS
+
+# # - name: Mount CentOS iso
+# #   command: mount -o loop /vagrant/isofiles/centos.iso /var/ftp/pub/centos
+
+# - name: Download Fedora files
+#   get_url:
+#     url: https://dl.fedoraproject.org/pub/fedora/linux/releases/28/Workstation/x86_64/os/images/install.img
+#     dest: /var/ftp/pub/fedora/images
+
+# # - name: Download Fedora files
+# #   get_url:
+# # url: http://ftp.halifax.rwth-aachen.de/fedora/linux/releases/28/Workstation/x86_64/iso/Fedora-Workstation-netinst-x86_64-28-1.1.iso
+# # dest: /vagrant/isofiles/fedora.iso
+
+# # - name: Mount Fedora iso
+# #   command: mount -o loop /vagrant/isofiles/fedora.iso /var/ftp/pub/fedora
+
+# - name: Download Fedora kernel
+#   get_url:
+#     url: https://dl.fedoraproject.org/pub/fedora/linux/releases/28/Workstation/x86_64/os/isolinux/vmlinuz
+#     dest: /var/lib/tftpboot/fedora/vmlinuz
+
+# - name: Download Fedora initrd.img
+#   get_url:
+#     url: https://dl.fedoraproject.org/pub/fedora/linux/releases/28/Workstation/x86_64/os/isolinux/initrd.img
+#     dest: /var/lib/tftpboot/fedora/initrd.img
+
+  - name: Mount virtual disk image
+    mount:
+      path: /srv
+      src: /dev/sdb1
+      fstype: xfs
+      state: mounted
+
+  - name: Edit /etc/fstab
+    lineinfile:
+      path: /etc/fstab
+      line: "/dev/sdb1 /srv   xfs defaults    0 0"
+
+  - name: Copy centos kernel file
+    copy:
+    src: /srv/centos/vmlinuz
+    dest: /var/lib/tftpboot/centos/vmlinuz
+    remote_src: yes
+
+  - name: Copy centos boot files
+    copy:
+      src: /srv/centos/initrd.img
+      dest: /var/lib/tftpboot/centos/initrd.img
+      remote_src: yes
+
+  - name: Copy centos install files
+    copy:
+      src: /srv/centos/squashfs.img
+      dest: /var/ftp/pub/centos/LiveOS
+      remote_src: yes
+
+  - name: Copy fedora kernel file
+    copy:
+      src: /srv/fedora/vmlinuz
+      dest: /var/lib/tftpboot/fedora/vmlinuz
+      remote_src: yes
+
+  - name: Copy fedora boot files
+    copy:
+      src: /srv/fedora/initrd.img
+      dest: /var/lib/tftpboot/fedora/initrd.img
+      remote_src: yes
+
+  - name: Copy fedora install files
+    copy:
+      src: /srv/fedora/install.img
+      dest: /var/ftp/pub/fedora/images
+      remote_src: yes
+
+  - name: Create PXEBoot menu file
+    copy:
+      dest: /var/lib/tftpboot/pxelinux.cfg/default
+      content: |
+        default menu.c32
+        prompt 0
+
+        MENU TITLE PXE Menu
+
+
+        LABEL 1
+        MENU LABEL ^1) Server
+        KERNEL /centos/vmlinuz
+        APPEND initrd=/centos/initrd.img inst.repo=ftp://172.16.0.39/pub/centos ks=ftp://172.16.0.39/pub/kick-centos.cfg
+
+
+        LABEL 2
+        MENU LABEL ^2) Werkstation
+        KERNEL /fedora/vmlinuz
+        APPEND initrd=/fedora/initrd.img inst.repo=ftp://172.16.0.39/pub/fedora ks=ftp://172.16.0.39/pub/kick-fedora.cfg
+
+  - name: Create CentOS kickstarter file
+    blockinfile:
+      create: yes
+      path: /var/ftp/pub/kick-centos.cfg
+      block: |
+        #version=DEVEL
+        # System authorization information
+        auth --enableshadow --passalgo=sha512 --kickstart
+        # Install OS instead of upgrade
+        install
+        # Use CDROM installation media
+        #cdrom
+        # Use text mode install
+        text
+        # Firewall configuration
+        firewall --disabled
+        firstboot --disable
+        ignoredisk --only-use=sda
+        # Keyboard layouts
+        # old format: keyboard us
+        # new format:
+        keyboard --vckeymap=be --xlayouts='be'
+        # System language
+        lang en_US.UTF-8
+
+        # Network information
+        network  --bootproto=dhcp --device=eth0 --activate
+        network  --hostname=client1.green.local
+        unsupported_hardware
+        # Reboot after installation
+        reboot --eject
+        # Root password
+        rootpw --plaintext vagrant
+        # SELinux configuration
+        selinux --permissive
+        # System services
+        services --enabled="chronyd"
+        # Do not configure the X Window System
+        skipx
+        # System timezone
+        timezone --utc Europe/Brussels
+        user --name=vagrant --password=vagrant
+        #Use Web installation
+        url --url="http://ftp.belnet.be/mirror/ftp.centos.org/7.5.1804/os/x86_64/"
+
+        # System bootloader configuration
+        bootloader --append="net.ifnames=0 biosdevname=0 crashkernel=auto" --location=mbr --boot-drive=sda
+        autopart --type=lvm
+        # Clear the Master Boot Record
+        zerombr
+        # Partition clearing information
+        clearpart --all --initlabel
+
+        %post
+        # sudo
+        echo "%vagrant ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/vagrant
+        chmod 0440 /etc/sudoers.d/vagrant
+
+        #Enable hyper-v daemons only if using hyper-v virtualization
+        if [ $(virt-what) == "hyperv" ]; then
+        yum -y install hyperv-daemons cifs-utils
+        systemctl enable hypervvssd
+        systemctl enable hypervkvpd
+        fi
+
+        # Since we disable consistent network naming, we need to make sure the eth0
+        # configuration file is in place so it will come up.
+        # Delete other network configuration first because RHEL/C7 networking will not
+        # restart successfully if there are configuration files for devices that do not
+        # exist.
+        rm -f /etc/sysconfig/network-scripts/ifcfg-e*
+        cat > /etc/sysconfig/network-scripts/ifcfg-eth0 << _EOF_
+        TYPE=Ethernet
+        PROXY_METHOD=none
+        BROWSER_ONLY=no
+        BOOTPROTO=dhcp
+        DEFROUTE=yes
+        IPV4_FAILURE_FATAL=no
+        IPV6INIT=yes
+        IPV6_AUTOCONF=yes
+        IPV6_DEFROUTE=yes
+        IPV6_FAILURE_FATAL=no
+        IPV6_ADDR_GEN_MODE=stable-privacy
+        NAME=eth0
+        DEVICE=eth0
+        ONBOOT=yes
+        _EOF_
+        %end
+
+        %packages --excludedocs --nobase --ignoremissing
+        bzip2
+        chrony
+        deltarpm
+        gcc
+        kernel-devel
+        kernel-headers
+        kexec-tools
+        make
+        net-tools
+        nfs-utils
+        openssh-clients
+        perl
+        selinux-policy-devel
+        sudo
+        wget
+        -aic94xx-firmware
+        -alsa-firmware
+        -alsa-tools-firmware
+        -fprintd-pam
+        -intltool
+        -ivtv-firmware
+        -iwl100-firmware
+        -iwl1000-firmware
+        -iwl105-firmware
+        -iwl135-firmware
+        -iwl2000-firmware
+        -iwl2030-firmware
+        -iwl3160-firmware
+        -iwl3945-firmware
+        -iwl4965-firmware
+        -iwl5000-firmware
+        -iwl5150-firmware
+        -iwl6000-firmware
+        -iwl6000g2a-firmware
+        -iwl6000g2b-firmware
+        -iwl6050-firmware
+        -iwl7260-firmware
+        -iwl7265-firmware
+
+        %end
+
+        %addon com_redhat_kdump --enable --reserve-mb='auto'
+
+        %end
+
+  - name: Create Fedora kickstarter file
+    blockinfile:
+      create: yes
+      path: /var/ftp/pub/kick-fedora.cfg
+      block: |
+        #platform=x86, AMD64, or Intel EM64T
+        #version=DEVEL
+        # System authorization information
+        auth  --useshadow  --passalgo=sha512 --kickstart
+        install
+        # Keyboard layouts
+        #keyboard 'be-latin1'
+        keyboard --vckeymap=be --xlayouts='be'
+
+        # System language
+        #lang en_US
+        lang en_US.UTF-8
+        # Halt after installation
+        halt
+        # System timezone
+        timezone Europe/Brussels --isUtc
+        # User
+        user --name=vagrant --password=vagrant
+        # Root password
+        rootpw --plaintext vagrant
+        # Network information
+        network  --bootproto=dhcp --device=eth0 --activate
+        network  --hostname=client2.green.local
+
+        # Use graphical install
+        graphical
+        # Use network installation
+        url --url https://dl.fedoraproject.org/pub/fedora/linux/releases/28/Workstation/x86_64/os
+        # Firewall configuration
+        firewall --disabled
+        firstboot --disable
+        ignoredisk --only-use=sda
+        # SELinux configuration
+        selinux --permissive
+        # System bootloader configuration
+        bootloader --append="net.ifnames=0 biosdevname=0 crashkernel=auto" --location=mbr --boot-drive=sda
+        autopart --type=lvm
+        # Clear the Master Boot Record
+        zerombr
+        # Partition clearing information
+        clearpart --all --initlabel
+        # X Window System configuration information
+        xconfig  --startxonboot
+
+        %post
+        # sudo
+        echo "%vagrant ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/vagrant
+        chmod 0440 /etc/sudoers.d/vagrant
+
+        # Since we disable consistent network naming, we need to make sure the eth0
+        # configuration file is in place so it will come up.
+        # Delete other network configuration first because RHEL/C7 networking will not
+        # restart successfully if there are configuration files for devices that do not
+        # exist.
+        rm -f /etc/sysconfig/network-scripts/ifcfg-e*
+        cat > /etc/sysconfig/network-scripts/ifcfg-eth0 << _EOF_
+        TYPE=Ethernet
+        PROXY_METHOD=none
+        BROWSER_ONLY=no
+        BOOTPROTO=dhcp
+        DEFROUTE=yes
+        IPV4_FAILURE_FATAL=no
+        IPV6INIT=yes
+        IPV6_AUTOCONF=yes
+        IPV6_DEFROUTE=yes
+        IPV6_FAILURE_FATAL=no
+        IPV6_ADDR_GEN_MODE=stable-privacy
+        NAME=eth0
+        DEVICE=eth0
+        ONBOOT=yes
+        _EOF_
+        %end
+
+
+        %packages
+        @^workstation-product-environment
+        @firefox
+        @libreoffice
+        %end
+
+  - name: Start & enable service xinetd
+    service:
+      name: xinetd
+      state: started
+      enabled: yes
+
+  - name: Start & enable service dhcpd
+    service:
+      name: dhcpd
+      state: started
+      enabled: yes
+
+  - name: Start & enable service vsftpd
+    service:
+      name: vsftpd
+      state: started
+      enabled: yes

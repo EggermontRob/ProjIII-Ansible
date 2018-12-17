@@ -1,0 +1,35 @@
+# .gitignore
+
+
+# Python development
+.ropeproject
+
+# Backup files (e.g. Vim, Gedit, etc.)
+*~
+
+# Compiled Python
+*.pyc
+
+# BATS installation
+test/bats/
+
+# Vagrant base boxes (you never know when someone puts one in the repository)
+*.box
+
+
+# Ansible Retry-files
+*.retry
+
+# Mac OSX files
+*.DS_Store
+
+#ISO files
+*.iso
+
+packer
+
+# REMI files
+*.rpm
+
+# PDFBestanden
+PDFBestanden 

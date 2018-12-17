@@ -1,0 +1,96 @@
+#Samba variables
+dns_nameservers: 
+  - "DNS1=172.16.0.40"
+
+samba_netbios_name: 'GREEN'
+samba_server_string: 'Samba file server'
+samba_workgroup: 'GREEN.LOCAL'
+samba_wins_support: false
+samba_mitigate_cve_2017_7494: false
+
+samba_passdb_backend: 'ldapsam:"ldap://alfa1.green.local"'
+samba_security: 'user'
+
+samba_global_include: lima-global-include.conf
+samba_homes_include: lima-home-include.conf
+
+samba_shares:
+  - name: itadministratie
+    comment: 'IT Administratie share'
+    group: itadministratie
+    write_list: +itadministratie
+#    create_mode: 0664
+#    directory_mode: 0775
+#    force_create_mode: 0664
+#    force_directory_mode: 0775
+    path: /srv/shares/itadministratie
+  - name: verkoop
+    comment: 'Verkoop share'
+    group: verkoop
+    write_list: +verkoop
+#    create_mode: 0664
+#    directory_mode: 0775
+#    force_create_mode: 0664
+#    force_directory_mode: 0775
+    path: /srv/shares/verkoop
+  - name: administratie
+    comment: 'Administratie share'
+    group: administratie
+    write_list: +administratie
+#    create_mode: 0664
+#    directory_mode: 0775
+#    force_create_mode: 0664
+#    force_directory_mode: 0775
+    path: /srv/shares/administratie
+  - name: ontwikkeling
+    comment: 'Ontwikkeling share'
+    group: ontwikkeling
+    write_list: +ontwikkeling
+#    create_mode: 0664
+#    directory_mode: 0775
+#    force_create_mode: 0664
+#    force_directory_mode: 0775
+    path: /srv/shares/ontwikkeling
+  - name: directie
+    comment: 'Directie share'
+    group: directie
+    write_list: +directie
+#    create_mode: 0664
+#    directory_mode: 0775
+#    force_create_mode: 0664
+#    force_directory_mode: 0775
+    path: /srv/shares/directie
+
+#rh-base variables
+rhbase_firewall_allow_services:
+    - samba
+rhbase_install_packages:
+    - smbldap-tools
+    - nss-pam-ldapd
+    - nscd
+    - openldap
+    - samba
+    - samba-common
+    - samba-client
+rhbase_user_groups:
+    - itadministratie
+    - verkoop
+    - administratie
+    - ontwikkeling
+    - directie
+rhbase_users:
+    - name: alice
+      groups:
+        - verkoop
+    - name: bob
+      groups:
+        - ontwikkeling
+    
+#hosts variables
+hosts_entries:
+  - name: alfa1.green.local
+    ip: 172.16.0.3
+    aliases:
+        - alfa1
+        - ad
+        - ad.green.local

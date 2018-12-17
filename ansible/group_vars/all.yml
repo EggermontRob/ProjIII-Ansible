@@ -1,0 +1,25 @@
+# group_vars/all.yml
+# Variables visible to all nodes
+---
+rhbase_repositories:
+  - epel-release
+rhbase_install_packages:
+  - bash-completion
+  - vim-enhanced
+  - bind-utils
+  - git
+  - nano
+  - tree
+  - wget
+rhbase_start_services:
+  - sshd
+# -------------------- DNS Settings --------------------
+# Adding the DNS search domain
+dns_search: green.local
+# Interface name of Host-only adapter
+#dns_intname: eth1
+# Volgende interface is diegene voor op de demo zelf:
+dns_intname: ens192
+# ------------------------------------------------------
+hosts_add_default_ipv4: true
+metricbeat_ip: 172.16.0.38

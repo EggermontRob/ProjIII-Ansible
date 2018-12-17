@@ -1,0 +1,36 @@
+---
+
+all:
+  children:
+    projecten3:
+      vars:
+        ansible_user: 'root'
+        ansible_ssh_pass: 'Projecten3'
+        ansible_become_pass: 'Projecten3'
+        host_key_checking: false
+      hosts:
+        alfa1:
+          ansible_ssh_host: 172.16.0.3
+        bravo1:
+          ansible_ssh_host: 172.16.0.4
+        charlie1:
+          ansible_ssh_host: 172.16.0.5
+        delta1:
+          ansible_ssh_host: 172.16.0.6
+        echo1:
+          ansible_ssh_host: 172.16.0.7
+        kilo1:
+          ansible_ssh_host: 172.16.0.34
+        lima1:
+          ansible_ssh_host: 172.16.0.35
+        mike1:
+          ansible_ssh_host: 172.16.0.36
+        november1:
+          ansible_ssh_host: 172.16.0.37
+        oscar1:
+          ansible_ssh_host: 172.16.0.38
+        papa1:
+          ansible_ssh_host: 172.16.0.39
+        quebec1:
+          ansible_ssh_host: 172.16.0.40
+        

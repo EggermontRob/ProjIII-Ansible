@@ -1,0 +1,112 @@
+!
+
+hostname Router4
+
+!
+
+boot-start-marker
+
+boot-end-marker
+
+!
+
+!
+
+!
+
+interface GigabitEthernet0/0/0
+ 
+ip address dhcp
+ 
+ip nat outside
+ 
+negotiation auto
+
+!
+
+interface GigabitEthernet0/0/1
+ 
+no ip address
+ 
+shutdown
+ 
+negotiation auto
+
+!
+
+interface Serial0/1/0
+ 
+ip address 192.0.2.13 255.255.255.252
+ 
+ip nat inside
+
+!
+
+interface Serial0/1/1
+ 
+ip address 192.0.2.17 255.255.255.252
+ 
+ip nat inside
+
+!
+
+interface GigabitEthernet0
+ 
+vrf forwarding Mgmt-intf
+ 
+no ip address
+ 
+shutdown
+ 
+negotiation auto
+
+!
+
+interface Vlan1
+ 
+no ip address
+ 
+shutdown
+
+!
+
+!
+
+router eigrp 1
+ 
+network 192.0.2.12 0.0.0.3
+ 
+network 192.0.2.16 0.0.0.3
+ 
+redistribute static
+
+!
+
+ip nat inside source list 10 interface GigabitEthernet0/0/0 overload
+ip route 0.0.0.0 0.0.0.0 172.22.255.254
+
+ip route 172.16.0.0 255.255.0.0 Serial0/1/0
+
+ip route 172.18.0.0 255.255.0.0 Serial0/1/1
+
+!
+
+!
+
+access-list 10 permit 172.16.0.0 0.0.255.255
+
+access-list 10 permit 172.18.0.0 0.0.255.255
+
+!
+
+!
+
+!
+
+line con 0
+ 
+logging synchronous
+ 
+!
+
+end

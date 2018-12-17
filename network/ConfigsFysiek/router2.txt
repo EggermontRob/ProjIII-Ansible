@@ -1,0 +1,88 @@
+!
+
+hostname Router2
+
+!
+!
+
+
+!
+
+interface GigabitEthernet0/0/0
+ 
+no ip address
+ 
+shutdown
+ 
+negotiation auto
+
+!
+
+interface GigabitEthernet0/0/1
+ 
+ip address 192.0.2.1 255.255.255.252
+ 
+negotiation auto
+
+!
+
+interface Serial0/1/0
+ 
+ip address 192.0.2.14 255.255.255.252
+
+!
+
+interface Serial0/1/1
+ 
+ip address 192.0.2.9 255.255.255.252
+
+clock rate 8000000
+!
+
+interface GigabitEthernet0
+ 
+vrf forwarding Mgmt-intf
+ 
+no ip address
+ 
+shutdown
+ 
+negotiation auto
+
+!
+
+!
+
+!
+
+router eigrp 1
+ 
+network 192.0.2.0 0.0.0.3
+ 
+network 192.0.2.8 0.0.0.3
+ 
+network 192.0.2.12 0.0.0.3
+ 
+redistribute static
+
+!
+
+
+ip route 0.0.0.0 0.0.0.0 Serial0/1/0
+
+ip route 172.16.0.0 255.255.0.0 GigabitEthernet0/0/1
+
+ip route 172.18.0.0 255.255.0.0 Serial0/1/1
+
+!
+
+!
+
+line con 0
+ 
+logging synchronous
+ 
+
+!
+
+end

@@ -1,0 +1,73 @@
+rhbase_firewall_allow_services:
+  - dns
+
+dns_nameservers: 
+  - "DNS1=172.16.0.40"
+ 
+bind_zone_domains:
+  - name: green.local
+    networks:
+        - "172.16.0" 
+    name_servers:
+        - bravo1
+        - charlie1
+    mail_servers:
+        - name: delta1
+          preference: 10
+    hosts:
+      - name: alfa1
+        ip: "172.16.0.3"
+        aliases:
+          - dc
+      - name: bravo1
+        ip: "172.16.0.4"
+        aliases:
+          - ns1
+      - name: charlie1
+        ip: "172.16.0.5"
+        aliases:
+          - ns2
+      - name: delta1
+        ip: "172.16.0.6"
+        aliases:
+          - mail
+      - name: echo1
+        ip: "172.16.0.7"
+        aliases:
+          - www
+      - name: kilo1
+        ip: "172.16.0.34"
+        aliases:
+          - dhcp
+      - name: lima1
+        ip: "172.16.0.35"
+        aliases:
+          - ftp
+      - name: mike1
+        ip: "172.16.0.36"
+        aliases:
+          - cms
+      - name: november1
+        ip: "172.16.0.37"
+        aliases:
+          - db
+      - name: oscar1
+        ip: "172.16.0.38"
+        aliases:
+          - monitor
+      - name: papa1
+        ip: "172.16.0.39"
+        aliases:
+          - pxe
+      - name: quebec1
+        ip: "172.16.0.40"
+          
+bind_acls:
+  - name: acl1
+    match_list:
+      - "172.16.0.0/27"
+      - "172.16.0.40"
+      
+bind_listen_ipv4: ['any']
+bind_allow_query: ['any']
+bind_zone_master_server_ip: "172.16.0.4"

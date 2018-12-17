@@ -1,0 +1,16 @@
+---
+rhbase_firewall_allow_services:
+  - http
+  - https
+ 
+dns_nameservers: 
+  - "DNS1=172.16.0.40"
+rhbase_selinux_booleans:
+  - httpd_can_network_connect_db
+httpd_status_enable: true
+
+drupal_database: 'dp_echo1'
+drupal_username: 'echo1'
+drupal_password: 'echo1'
+drupal_database_host: '172.16.0.37'
+drupal_prefix: 'drup_'

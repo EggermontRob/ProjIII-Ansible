@@ -1,0 +1,25 @@
+---
+rhbase_firewall_allow_services:
+  - mysql
+dns_nameservers: 
+  - "DNS1=172.16.0.40"
+
+
+mariadb_bind_address: '172.16.0.37' #0.0.0.0
+mariadb_port: 3306
+mariadb_databases:
+  - name: dp_echo1
+  - name: wp_mike1
+mariadb_users:
+  - name: echo1
+    password: 'echo1'
+    priv: "dp_echo1.*:ALL,GRANT"
+    append_privs: 'yes'
+    host: "172.16.0.7"
+  - name: mike1
+    password: 'mike1'
+    priv: "wp_mike1.*:ALL,GRANT"
+    append_privs: 'yes'
+    host: "172.16.0.36"
+mariadb_mirror: 'mariadb.mirror.nucleus.be/yum'
+mariadb_root_password: 'november1'  

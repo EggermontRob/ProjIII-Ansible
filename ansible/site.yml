@@ -1,0 +1,391 @@
+# site.yml
+---
+- hosts: all
+  vars:
+  become: true
+  roles:
+    - bertvv.rh-base
+    - bertvv.hosts
+    - lennertmertens.dns
+  post_tasks: # Only for testing environment, in demo removed
+  #   - name: Set PEERDNS=no
+  #     lineinfile:
+  #      path: /etc/sysconfig/network-scripts/ifcfg-eth0
+  #      line: PEERDNS=no
+  #   - name: Restart network service
+  #     systemd:
+  #       name: network.service
+  #       state: restarted
+     - name: Ansible copy test directory to server
+       copy:
+          src: ./files/tests/
+          dest: ./tests
+          owner: root
+          group: root
+          mode: u=rwx,g=rwx,o=rwx
+  # tasks:
+  #   - name: Install metricbeat
+  #     yum:
+  #       name: http://netlabfs/public/elastic/metricbeat-6.4.2-x86_64.rpm
+  #       state: present
+  #   - name: Install java
+  #     yum:
+  #       name: jre
+  #       state: present
+  #     when: inventory_hostname == "oscar1"
+  #   - name: Install elasticsearch
+  #     yum:
+  #       name: http://netlabfs/public/elastic/elasticsearch-6.4.2.rpm
+  #       state: present
+  #     when: inventory_hostname == "oscar1"
+  #   - name: Install kibana
+  #     yum:
+  #       name: http://netlabfs/public/elastic/kibana-6.4.2-x86_64.rpm
+  #       state: present
+  #     when: inventory_hostname == "oscar1"
+  #   - name: Install packetbeat
+  #     yum:
+  #       name: http://netlabfs/public/elastic/packetbeat-6.4.2-x86_64.rpm
+  #       state: present
+  #     when: inventory_hostname == "oscar1"
+
+
+- hosts: alfa1
+  vars:
+  become: true
+  roles:
+    - lennertmertens.389ds
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: alfa1.green.local
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.1
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: bravo1
+  vars:
+  become: true
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: bravo1.green.local
+  roles:
+    - bertvv.bind
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.1
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: charlie1
+  vars:
+  become: true
+  roles:
+    - bertvv.bind
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: charlie1.green.local
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.1
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: delta1
+  vars:
+  become: true
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: detla1.green.local
+  roles:
+    - bertvv.rh-base
+    - eggermontrob.mailserver
+    - bertvv.squirrelmail
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  tasks:
+  - name: Set httpd_can_network_connect flag on and keep it persistent across reboots
+    seboolean:
+      name: httpd_can_network_connect
+      state: yes
+      persistent: yes
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.1
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: echo1
+  vars:
+  become: true
+  roles:
+    - bertvv.rh-base
+    - bertvv.httpd
+    - bertvv.drupal
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: echo1.green.local
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.1
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: kilo1
+  vars:
+  become: true
+  roles:
+    - bertvv.rh-base
+    - bertvv.dhcp
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: kilo1.green.local
+  tasks:
+    - name: Install syslinux
+      yum:
+        name: syslinux
+        state: present
+    - name: Add lines to dhcpd config for client range
+      blockinfile:
+        path: "/etc/dhcp/dhcpd.conf"
+        block: |
+          shared-network clients {
+              subnet 172.16.1.0 netmask 255.255.255.192{
+                  range 172.16.1.8 172.16.1.62;
+           		    option routers 172.16.1.1;
+           		    option subnet-mask 255.255.255.192;
+           		    allow bootp;
+           		    allow booting;
+                  filename "pxelinux.0";
+                   }
+            }
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.33
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: lima1
+  vars:
+  become: true
+  roles:
+    - bertvv.samba
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: lima1.green.local
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.33
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: echo1
+  vars:
+  become: true
+  roles:
+    - bertvv.rh-base
+    - bertvv.httpd
+    - bertvv.drupal
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: echo1.green.local
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.33
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: mike1
+  vars:
+  become: true
+  roles:
+    - bertvv.rh-base
+    - bertvv.httpd
+    - bertvv.wordpress
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: mike1.green.local
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.33
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+
+- hosts: november1
+  vars:
+  become: true
+  roles:
+    - bertvv.rh-base
+    - bertvv.mariadb
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: november1.green.local
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.33
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: oscar1
+  vars:
+  roles:
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  become: true
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: oscar1.green.local
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.33
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+
+- hosts: papa1
+  vars:
+  become: true
+  roles:
+    - thibovdb.pxeserver
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: papa1.green.local
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.33
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+- hosts: quebec1
+  vars:
+  become: true
+  roles:
+    - bertvv.dnsmasq
+    - tvandeveire.ekstack_metricbeat_packetbeat
+  pre_tasks:
+    - name: Setting hostname
+      hostname:
+        name: quebec1.green.local
+    - name: Hosts toevoegen aan /etc/hosts
+      blockinfile:
+        path: "/etc/hosts"
+        block: |
+          172.16.0.3  alfa1.green.local alfa1
+          172.16.0.4  bravo1.green.local bravo1
+          172.16.0.5  charlie1.green.local charlie1
+          172.16.0.6  delta1.green.local delta1
+          172.16.0.7  echo1.green.local echo1
+          172.16.0.34  kilo1.green.local kilo1
+          172.16.0.35  lima1.green.local lima1
+          172.16.0.36  mike1.green.local mike1
+          172.16.0.37  november1.green.local november1
+          172.16.0.38  oscar1.green.local oscar1
+          172.16.0.39  papa1.green.local papa1
+  post_tasks:
+    - name: Remove the NAT default gateway on ens224
+      shell: nmcli con modify ens224 ipv4.never-default true
+    - name: Configure default gateway on ens192
+      shell: nmcli con modify "System ens192" ipv4.never-default false
+    - name: Add default gateway
+      shell: nmcli con modify "System ens192" ipv4.gateway 172.16.0.33
+    - name: Restart network service
+      systemd:
+        name: network.service
+        state: restarted
+
+# Vervang op school 1.1.1.1 en 8.8.8.8 door
+# DNS van hogent1 193.190.173.1 & DNS van hogent2 193.190.173.2
